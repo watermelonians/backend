@@ -5,5 +5,5 @@ export const todoController = (req: Request, res: Response) => {
 
   res.status(200).json({ todos: [res.locals.picture, "pray", "eat", "sleep"] });
 
-  console.log(`returned: [${res.locals.picture}, "pray", "eat", "sleep"]`);
+  console.log(`recieved request `);
 };
