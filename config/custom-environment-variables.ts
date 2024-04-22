@@ -1,5 +1,11 @@
 export default {
-    port: 'PORT',
-    nodeEnv: 'NODE_ENV',
-  };
-  
+  port: "PORT",
+  postgresConfig: {
+    host: "POSTGRES_HOST",
+    port: "POSTGRES_PORT",
+    username: "POSTGRES_USER",
+    password: "POSTGRES_PASSWORD",
+    database: "POSTGRES_DB",
+    nextPublicURL: "NEXT_PUBLIC_URL",
+  },
+};

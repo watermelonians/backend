@@ -1,80 +1,73 @@
 require("dotenv").config();
-import express, { NextFunction, Request, Response, response } from "express";
+import express, { Response, Request, NextFunction } from "express";
 import config from "config";
-import cors from "cors";
-import morgan from "morgan";
-import cookieParser from "cookie-parser";
 import validateEnv from "./utils/validateEnv";
-import { PrismaClient } from "@prisma/client";
+import { AppDataSource } from "./utils/data-source";
+import morgan from "morgan";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import AppError from "./utils/appError";
-import tempRouter from "./routes/temp.route";
+import tempRouter from "./routes/user.routes";
 
-validateEnv();
+AppDataSource.initialize()
+  .then(async () => {
+    // VALIDATE ENV
+    validateEnv();
 
-const prisma = new PrismaClient();
-const app = express();
+    const app = express();
 
-async function bootstrap() {
-  // TEMPLATE ENGINE
-  app.set("view engine", "pug");
-  app.set("views", `${__dirname}/views`);
+    // MIDDLEWARE
 
-  // MIDDLEWARE
+    // 1. Body parser
+    app.use(express.json({ limit: "100kb" }));
 
-  // 1.Body Parser
-  app.use(express.json({ limit: "10kb" }));
+    // 2. Logger
+    if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
-  // 2. Cookie Parser
-  app.use(cookieParser());
+    // 3. Cookie Parser
+    app.use(cookieParser());
 
-  // 2. Cors
-  app.use(
-    cors({
-      origin: [config.get<string>("origin")],
-      credentials: true,
-    })
-  );
+    // 4. Cors
+    app.use(
+      cors({
+        // origin: config.get<string>("nextPublicURL"),
+        //origin: "https://react-frontend-slim-together.vercel.app",
+        origin: "*",
+        credentials: true,
+      })
+    );
+    // ROUTES
+    app.use("/api", tempRouter);
 
-  // 3. Logger
-  if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
-
-  // ROUTES
-  app.use("/api", tempRouter);
-
-  // Testing
-  app.get("/api/healthchecker", (_, res: Response) => {
-    res.status(200).json({
-      status: "success",
-      message: "Welcome to NodeJs with Prisma and PostgreSQL",
+    // HEALTH CHECKER
+    app.get("/api/healthchecker", async (_, res: Response) => {
+      res.status(200).json({
+        status: "success",
+        message: "Welcome to WATERMELONIANS's API",
+      });
     });
-  });
 
-  // UNHANDLED ROUTES
-  app.all("*", (req: Request, res: Response, next: NextFunction) => {
-    next(new AppError(404, `Route ${req.originalUrl} not found`));
-  });
-
-  // GLOBAL ERROR HANDLER
-  app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
-    err.status = err.status || "error";
-    err.statusCode = err.statusCode || 500;
-
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
+    // UNHANDLED ROUTE
+    app.all("*", (req: Request, res: Response, next: NextFunction) => {
+      next(new AppError(404, `Route ${req.originalUrl} not found`));
     });
-  });
 
-  const port = config.get<number>("port");
-  app.listen(port, () => {
-    console.log(`Server on port: ${port}`);
-  });
-}
+    // GLOBAL ERROR HANDLER
+    app.use(
+      (error: AppError, req: Request, res: Response, next: NextFunction) => {
+        error.status = error.status || "error";
+        error.statusCode = error.statusCode || 500;
 
-bootstrap()
-  .catch((err) => {
-    throw err;
+        res.status(error.statusCode).json({
+          status: error.status,
+          message: error.message,
+        });
+      }
+    );
+
+    const port = config.get<number>("port");
+    app.listen(port);
+
+    console.log(`Server started on port: ${port}`);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((error) => console.log(error));
