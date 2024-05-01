@@ -1,36 +1,26 @@
-import {
-  Entity,
-  Column,
-  Index,
-  OneToMany,
-  PrimaryColumn,
-  OneToOne,
-} from "typeorm";
+import { Entity, Column, OneToMany, ManyToMany } from "typeorm";
 import Model from "../Model.entity";
-import { Problem } from "../Problem/Problem.entity";
+import { Attachment, Problem } from "../Problem/Problem.entity";
 import {
   CommentDiscussionEntry,
   DiscussionEntry,
-} from "../Problem/ProblemDiscussion";
+} from "../Problem/ProblemDiscussion.entity";
 
-@Entity()
+@Entity("user")
 export class User extends Model {
   // @Index("uid_index")
   @Column({ name: "uid", unique: true })
   uid: string;
 
-  @Column({ name: "fname" })
-  fName: string;
-
-  @Column({ name: "lname" })
-  lName: string;
+  @Column({ name: "displayname" })
+  displayName: string;
 
   // @Index("email_index")
   @Column({ name: "email" })
   email: string;
 
-  @Column({ name: "picture", default: "" })
-  picture: string;
+  @Column({ name: "photourl", default: "" })
+  photoURL: string;
 
   @OneToMany((type) => Problem, (prob) => prob.user, {
     nullable: true,
@@ -53,17 +43,22 @@ export class User extends Model {
   })
   commentsDiscussionEntries: CommentDiscussionEntry[];
 
-  // TODO: User roles
+  @ManyToMany((type) => Problem, (prob) => prob.likedUsers, { nullable: true })
+  likedProblems: Problem[];
 
+  @OneToMany((type) => Attachment, (att) => att.user)
+  attachments: Attachment[];
+
+  // TODO: User roles
 }
 
-@Entity()
+@Entity("teacher")
 export class Teacher extends User {
   @Column({ name: "schoolJoinDate" })
   schoolJoinDate: Date;
 }
 
-@Entity()
+@Entity("administration")
 export class Administration extends User {
   @Column({ name: "schoolJoinDate" })
   schoolJoinDate: Date;

@@ -4,15 +4,15 @@ import { User } from "../entities/User/User.entity";
 
 export const tempHandler = async (req: Request, res: Response) => {
   let uid = res.locals.uid;
-  let picture = res.locals.picture;
-  let name = res.locals.display_name;
+  let picture = res.locals.photoURL;
+  let displayName = res.locals.displayName;
   let email = res.locals.email;
-  let phone_number = res.locals.phone_number;
+  let phoneNumber = res.locals.phoneNumber;
   return res.json({
-    message: "you are: " + name,
+    message: "you are: " + displayName,
     email: email,
     picture: picture,
     uid: uid,
-    phone_number: phone_number,
+    phone_number: phoneNumber,
   });
 };

@@ -9,8 +9,8 @@ import {
 import Model from "../Model.entity";
 import { User } from "../User/User.entity";
 import { Module_ } from "../Module.entity";
-import { DiscussionEntry } from "./ProblemDiscussion";
-import { Tag } from "../Tag";
+import { DiscussionEntry } from "./ProblemDiscussion.entity";
+import { Tag } from "../Tag.entity";
 
 @Entity("problem")
 export class Problem extends Model {
@@ -23,24 +23,18 @@ export class Problem extends Model {
   @Column({ name: "description" })
   description: string;
 
-  // TODO: implement attachments table
-  @Column({
-    name: "attachments",
-    type: "text",
-    default: [],
-    array: true,
+  @OneToMany((type) => Attachment, (attachment) => attachment.problem, {
     nullable: true,
   })
-  attachments: string[];
+  attachments: Attachment[];
 
-  @ManyToMany((type) => Tag, { nullable: true })
+  @ManyToMany((type) => Tag, (tag) => tag.problems, { nullable: true })
   @JoinTable()
   tags: Tag[];
 
   @Column({ name: "isAnonymous", default: false })
   isAnonymous: boolean;
 
-  // TODO: implement Discussion mechanics
   @OneToMany((type) => DiscussionEntry, (de) => de.problem, {
     nullable: true,
     onDelete: "CASCADE",
@@ -48,7 +42,9 @@ export class Problem extends Model {
   })
   discussionEntries: DiscussionEntry[];
 
-  // TODO: implement likes mechanics
+  @ManyToMany((type) => User)
+  @JoinTable()
+  likedUsers: User[];
 
   // TODO: cluster
 }
@@ -71,4 +67,23 @@ export class Problem2Administration extends Problem {
   // TODO: problem2administration
   @Column()
   filter: string;
+}
+
+@Entity("attachment")
+export class Attachment extends Model {
+  @Column({ name: "title" })
+  title: string;
+
+  @Column({ name: "body" })
+  body: string;
+
+  @ManyToOne((type) => User, (user) => user.attachments)
+  user: User;
+
+  @ManyToOne((type) => Problem, (prob) => prob.attachments, {
+    nullable: true /**sorry */,
+  })
+  problem: Problem;
+
+  // type? as in image or doc or...
 }

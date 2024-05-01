@@ -3,7 +3,7 @@ import { AppDataSource } from "../utils/data-source";
 
 const userRepository = AppDataSource.getRepository(User);
 
-export const createUser = async (input: any) => {
+export const createUser = async (input: Partial<User>) => {
   console.log("create user input::\n", input);
   const user = AppDataSource.manager.create(User, input);
 
