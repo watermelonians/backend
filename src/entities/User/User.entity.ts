@@ -1,6 +1,17 @@
-import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  Index,
+  OneToMany,
+  PrimaryColumn,
+  OneToOne,
+} from "typeorm";
 import Model from "../Model.entity";
-import { Problem } from "../Problem.entity";
+import { Problem } from "../Problem/Problem.entity";
+import {
+  CommentDiscussionEntry,
+  DiscussionEntry,
+} from "../Problem/ProblemDiscussion";
 
 @Entity()
 export class User extends Model {
@@ -22,10 +33,28 @@ export class User extends Model {
   picture: string;
 
   @OneToMany((type) => Problem, (prob) => prob.user, {
+    nullable: true,
     onDelete: "CASCADE",
     cascade: true,
   })
   problems: Problem[];
+
+  @OneToMany((type) => DiscussionEntry, (de) => de.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  discussionEntries: DiscussionEntry[];
+
+  @OneToMany((type) => CommentDiscussionEntry, (cde) => cde.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  commentsDiscussionEntries: CommentDiscussionEntry[];
+
+  // TODO: User roles
+
 }
 
 @Entity()
@@ -39,8 +68,8 @@ export class Administration extends User {
   @Column({ name: "schoolJoinDate" })
   schoolJoinDate: Date;
 
-  @Column({ name: "roles" })
-  roles: String;
+  // @Column({ name: "roles" })
+  // roles: String;
 
   @Column({ name: "isTeacher" })
   isTeacher: boolean;
