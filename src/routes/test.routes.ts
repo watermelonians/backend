@@ -23,23 +23,23 @@ router.post("/createTag", async (req: Request, res: Response) => {
   console.log(`tagName: ${tagName}`);
   try {
     const tag = await createTag({ name: tagName });
-    res.json({
+    res.status(200).json({
       message: `created tag "${tag.name}"`,
     });
   } catch (error: any) {
     if (error instanceof AppError) {
-      if (error.status === "400") {
-        res.json({
-          message: error.error.message,
+      if (error.status == 400) {
+        res.status(error.status).json({
+          message: error.message,
         });
       } else {
-        res.json({
-          message: "unknown error, (probably typeorm)",
+        res.status(error.status).json({
+          message: "unknown error, (likely typeorm)",
         });
       }
     } else {
-      res.json({
-        message: "genuenly unknown error",
+      res.status(500).json({
+        message: "Unknown error",
       });
     }
   }
@@ -47,7 +47,7 @@ router.post("/createTag", async (req: Request, res: Response) => {
 
 router.all("/problemId", (req: Request, res: Response) => {
   const problem = new Problem();
-  
+
   res.status(200).json({ so: problem.id ?? "shame" });
 });
 

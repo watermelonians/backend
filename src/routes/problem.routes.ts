@@ -4,17 +4,26 @@ import {
   decodeToken,
 } from "../middleware/authentication.middleware";
 import {
+  addCommentDicussionEntryController,
   addDiscussionEntryController,
   addProblemController,
   getMyProblemsController,
 } from "../controllers/problem.controllers";
 import { validate } from "../middleware/validateZod";
 import {
+  addCommentDicussionEntrySchema,
   addDiscussionEntrySchema,
   addProblemShemas as addProblemShema,
 } from "../schemas/problem.schemas";
 
 const router = Router();
+
+router.get(
+  "/getMyProblems",
+  decodeToken,
+  addUserIfNotFound,
+  getMyProblemsController
+);
 
 router.post(
   "/addProblem",
@@ -32,10 +41,12 @@ router.post(
   addDiscussionEntryController
 );
 
-router.get(
-  "/getMyProblems",
+router.post(
+  "/addCommentDicussionEntry",
   decodeToken,
   addUserIfNotFound,
-  getMyProblemsController
+  validate(addCommentDicussionEntrySchema),
+  addCommentDicussionEntryController
 );
+
 export default router;

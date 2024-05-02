@@ -15,11 +15,14 @@ import {
   attachmentType as attachmentArrayType,
 } from "../schemas/problem.schemas";
 import { createAttachmentsFromList } from "./attachment.services";
-import { DiscussionEntry } from "../entities/Problem/ProblemDiscussion.entity";
-import { strict } from "assert";
+import {
+  CommentDiscussionEntry,
+  DiscussionEntry,
+} from "../entities/Problem/ProblemDiscussion.entity";
+import AppError from "../utils/appError";
 
 const problemRepository = AppDataSource.getRepository(Problem);
-const attachmentRepository = AppDataSource.getRepository(Attachment);
+const discussionEntryRepository = AppDataSource.getRepository(DiscussionEntry);
 
 export const createProblem = async (input: {
   uid: string;
@@ -53,6 +56,21 @@ export const findProblemById = async ({ id: id }: { id: string }) => {
   return await problemRepository.findOneBy({ id });
 };
 
+export const findProblemsbyUid = async ({ uid }: { uid: string }) => {
+  return await problemRepository.find({
+    where: {
+      user: { uid: uid },
+    },
+    relations: {
+      tags: true,
+      discussionEntries: {
+        comments: true,
+      },
+      attachments: true,
+    },
+  });
+};
+
 export const createDiscussionEntry = async ({
   uid,
   problemId,
@@ -62,24 +80,53 @@ export const createDiscussionEntry = async ({
   problemId: string;
   body: string;
 }) => {
-  const de = new DiscussionEntry();
+  const problem = await findProblemById({ id: problemId });
 
-  de.body = body;
-  de.user = (await findUserByUid({ uid })) ?? new User();
-  de.problem = (await findProblemById({ id: problemId })) ?? new Problem();
+  if (!problem) {
+    throw new AppError(404, `No Problem with id ${problemId} found`);
+  } else {
+    const de = new DiscussionEntry();
 
-  return (await AppDataSource.manager.save(de)) as DiscussionEntry;
+    de.body = body;
+    de.user = (await findUserByUid({ uid })) ?? new User();
+    de.problem = problem;
+
+    return (await AppDataSource.manager.save(de)) as DiscussionEntry;
+  }
 };
 
-export const getProblemsbyUid = async ({ uid }: { uid: string }) => {
-  return await problemRepository.find({
-    where: {
-      user: { uid: uid },
-    },
-    relations: {
-      tags: true,
-      discussionEntries: true,
-      attachments: true,
-    },
-  });
+export const findDiscussionEntryById = async ({
+  discussionEntryId,
+}: {
+  discussionEntryId: string;
+}) => {
+  return await discussionEntryRepository.findOneBy({ id: discussionEntryId });
+};
+
+export const createCommentDiscussionEntry = async ({
+  uid,
+  discussionEntryId,
+  body,
+}: {
+  uid: string;
+  discussionEntryId: string;
+  body: string;
+}) => {
+  const de =
+    (await findDiscussionEntryById({ discussionEntryId })) ??
+    new DiscussionEntry();
+  if (!de) {
+    throw new AppError(
+      404,
+      `No DiscussionEntry with id ${discussionEntryId} found`
+    );
+  } else {
+    const cde = new CommentDiscussionEntry();
+
+    cde.body = body;
+    cde.user = (await findUserByUid({ uid })) ?? new User();
+    cde.discussionEntry = de;
+
+    return (await AppDataSource.manager.save(cde)) as CommentDiscussionEntry;
+  }
 };

@@ -31,6 +31,7 @@ export class CommentDiscussionEntry extends Model {
     nullable: false,
   })
   discussionEntry: DiscussionEntry;
+
   @Column({ name: "body" })
   body: string;
 

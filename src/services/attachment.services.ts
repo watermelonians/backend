@@ -2,7 +2,6 @@ import { Attachment } from "../entities/Problem/Problem.entity";
 import { User } from "../entities/User/User.entity";
 import { attachmentType as attachmentsType } from "../schemas/problem.schemas";
 import { AppDataSource } from "../utils/data-source";
-import { findProblemById } from "./problem.services";
 import { findUserByUid } from "./user.services";
 
 export const createAttachmentsFromList = async (
@@ -14,9 +13,9 @@ export const createAttachmentsFromList = async (
 
   const attachmentPromises = attachments.map(async (entry) => {
     const attachment = new Attachment();
+
     attachment.title = entry.attachmentTitle;
     attachment.body = entry.attachmentBody;
-
     attachment.user = (await findUserByUid({ uid })) ?? new User();
 
     const savedAttachement = (await AppDataSource.manager.save(
@@ -27,6 +26,6 @@ export const createAttachmentsFromList = async (
 
   // TEST
   await Promise.all(attachmentPromises);
-  
+
   return atts;
 };

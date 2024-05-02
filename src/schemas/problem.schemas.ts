@@ -1,4 +1,4 @@
-import { object, array, string, z } from "zod";
+import { object, array, string, z, set } from "zod";
 
 export const addProblemShemas = object({
   body: object({
@@ -29,4 +29,15 @@ export const addDiscussionEntrySchema = object({
 
 export type addDiscussionEntryType = z.infer<
   typeof addDiscussionEntrySchema
+>["body"];
+
+export const addCommentDicussionEntrySchema = object({
+  body: object({
+    discussionEntryId: string(),
+    body: string(),
+  }),
+});
+
+export type addCommentDicussionEntryType = z.infer<
+  typeof addCommentDicussionEntrySchema
 >["body"];
