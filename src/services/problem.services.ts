@@ -7,14 +7,19 @@ import {
   Problem2Students,
 } from "../entities/Problem/Problem.entity";
 import { AppDataSource } from "../utils/data-source";
-import { Tag } from "../entities/Tag.entity";
 import { getTagsFromList } from "./tag.services";
 import { findUserByUid } from "./user.services";
 import { User } from "../entities/User/User.entity";
-import { attachmentType as attachmentArrayType } from "../schemas/problem.schemas";
+import {
+  addDiscussionEntryType,
+  attachmentType as attachmentArrayType,
+} from "../schemas/problem.schemas";
 import { createAttachmentsFromList } from "./attachment.services";
+import { DiscussionEntry } from "../entities/Problem/ProblemDiscussion.entity";
+import { strict } from "assert";
 
 const problemRepository = AppDataSource.getRepository(Problem);
+const attachmentRepository = AppDataSource.getRepository(Attachment);
 
 export const createProblem = async (input: {
   uid: string;
@@ -31,7 +36,6 @@ export const createProblem = async (input: {
 
   problem.user = (await findUserByUid({ uid })) ?? new User();
 
-  // TODO: attachments
   if (tags) {
     problem.tags = await getTagsFromList(tags);
   }
@@ -47,4 +51,35 @@ export const createProblem = async (input: {
 
 export const findProblemById = async ({ id: id }: { id: string }) => {
   return await problemRepository.findOneBy({ id });
+};
+
+export const createDiscussionEntry = async ({
+  uid,
+  problemId,
+  body,
+}: {
+  uid: string;
+  problemId: string;
+  body: string;
+}) => {
+  const de = new DiscussionEntry();
+
+  de.body = body;
+  de.user = (await findUserByUid({ uid })) ?? new User();
+  de.problem = (await findProblemById({ id: problemId })) ?? new Problem();
+
+  return (await AppDataSource.manager.save(de)) as DiscussionEntry;
+};
+
+export const getProblemsbyUid = async ({ uid }: { uid: string }) => {
+  return await problemRepository.find({
+    where: {
+      user: { uid: uid },
+    },
+    relations: {
+      tags: true,
+      discussionEntries: true,
+      attachments: true,
+    },
+  });
 };

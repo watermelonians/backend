@@ -1,5 +1,4 @@
 import { object, array, string, z } from "zod";
-import { Attachment } from "../entities/Problem/Problem.entity";
 
 export const addProblemShemas = object({
   body: object({
@@ -20,3 +19,14 @@ export type addProblemType = z.infer<typeof addProblemShemas>["body"];
 export type attachmentType = z.infer<
   typeof addProblemShemas
 >["body"]["attachments"];
+
+export const addDiscussionEntrySchema = object({
+  body: object({
+    problemId: string(),
+    body: string(),
+  }),
+});
+
+export type addDiscussionEntryType = z.infer<
+  typeof addDiscussionEntrySchema
+>["body"];

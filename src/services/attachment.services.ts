@@ -1,13 +1,13 @@
 import { Attachment } from "../entities/Problem/Problem.entity";
 import { User } from "../entities/User/User.entity";
-import { attachmentType } from "../schemas/problem.schemas";
+import { attachmentType as attachmentsType } from "../schemas/problem.schemas";
 import { AppDataSource } from "../utils/data-source";
 import { findProblemById } from "./problem.services";
 import { findUserByUid } from "./user.services";
 
 export const createAttachmentsFromList = async (
   uid: string,
-  attachments: attachmentType
+  attachments: attachmentsType
 ) => {
   if (!attachments) return;
   let atts: Attachment[] = [];
@@ -25,5 +25,8 @@ export const createAttachmentsFromList = async (
     atts.push(savedAttachement);
   });
 
+  // TEST
+  await Promise.all(attachmentPromises);
+  
   return atts;
 };

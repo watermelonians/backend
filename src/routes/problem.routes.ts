@@ -3,9 +3,16 @@ import {
   addUserIfNotFound,
   decodeToken,
 } from "../middleware/authentication.middleware";
-import { addProblemController } from "../controllers/problem.controllers";
+import {
+  addDiscussionEntryController,
+  addProblemController,
+  getMyProblemsController,
+} from "../controllers/problem.controllers";
 import { validate } from "../middleware/validateZod";
-import { addProblemShemas as addProblemShema } from "../schemas/problem.schemas";
+import {
+  addDiscussionEntrySchema,
+  addProblemShemas as addProblemShema,
+} from "../schemas/problem.schemas";
 
 const router = Router();
 
@@ -17,4 +24,18 @@ router.post(
   addProblemController
 );
 
+router.post(
+  "/addDiscussionEntry",
+  decodeToken,
+  addUserIfNotFound,
+  validate(addDiscussionEntrySchema),
+  addDiscussionEntryController
+);
+
+router.get(
+  "/getMyProblems",
+  decodeToken,
+  addUserIfNotFound,
+  getMyProblemsController
+);
 export default router;
