@@ -14,7 +14,7 @@ export const createTag = async (input: Partial<Tag>) => {
     if (error.code === "23505") {
       throw new AppError(400, `Tag ${error.detail}`);
     } else {
-      throw new AppError(500, "There was an unknown error.");
+      throw new AppError(500, "Unknown error creating Tags");
     }
   }
 };

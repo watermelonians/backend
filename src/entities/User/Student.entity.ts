@@ -1,8 +1,7 @@
 import { Column, Entity } from "typeorm";
-import Model from "../Model.entity";
 import { User } from "./User.entity";
 
-@Entity()
+@Entity("student")
 export class Student extends User {
   @Column({ name: "promo" })
   promo: string;

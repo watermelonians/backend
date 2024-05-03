@@ -8,7 +8,7 @@ export const tempHandler = async (req: Request, res: Response) => {
   let displayName = res.locals.displayName;
   let email = res.locals.email;
   let phoneNumber = res.locals.phoneNumber;
-  return res.json({
+  return res.status(200).json({
     message: "you are: " + displayName,
     email: email,
     picture: picture,

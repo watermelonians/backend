@@ -42,20 +42,14 @@ export const addDiscussionEntryController = async (
       problemId,
       body,
     });
-    res.json({
+
+    res.status(200).json({
       message: `created DiscussionEntry with id ${discussionEntry.id}`,
     });
   } catch (error: any) {
-    // console.log(error);
-    if (error instanceof AppError) {
-      res.status(error.status).json({
-        message: error.message,
-      });
-    } else {
-      res.status(500).json({
-        message: "Unknown error creating DiscussionEntry",
-      });
-    }
+    res.status(error.status).json({
+      message: error.message,
+    });
   }
 };
 

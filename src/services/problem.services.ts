@@ -53,7 +53,11 @@ export const createProblem = async (input: {
 };
 
 export const findProblemById = async ({ id: id }: { id: string }) => {
-  return await problemRepository.findOneBy({ id });
+  try {
+    return await problemRepository.findOneBy({ id });
+  } catch (error: any) {
+    throw new AppError(404, `No Problem with id ${id} found`);
+  }
 };
 
 export const findProblemsbyUid = async ({ uid }: { uid: string }) => {
@@ -80,18 +84,25 @@ export const createDiscussionEntry = async ({
   problemId: string;
   body: string;
 }) => {
-  const problem = await findProblemById({ id: problemId });
+  let problem;
+  try {
+    problem = await findProblemById({ id: problemId });
 
-  if (!problem) {
-    throw new AppError(404, `No Problem with id ${problemId} found`);
-  } else {
     const de = new DiscussionEntry();
 
     de.body = body;
     de.user = (await findUserByUid({ uid })) ?? new User();
-    de.problem = problem;
+    de.problem = problem ?? new Problem();
 
     return (await AppDataSource.manager.save(de)) as DiscussionEntry;
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    } else
+      throw new AppError(
+        500,
+        "Unknown error at createDiscussionEntry or findUserByUid"
+      );
   }
 };
 
@@ -100,7 +111,11 @@ export const findDiscussionEntryById = async ({
 }: {
   discussionEntryId: string;
 }) => {
-  return await discussionEntryRepository.findOneBy({ id: discussionEntryId });
+  try {
+    return await discussionEntryRepository.findOneBy({ id: discussionEntryId });
+  } catch (error: any) {
+    throw new AppError(404, `No DiscussionEntry with id ${discussionEntryId} found`);
+  }
 };
 
 export const createCommentDiscussionEntry = async ({

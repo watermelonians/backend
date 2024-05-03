@@ -14,7 +14,7 @@ router.post("/getTagsFromList", async (req: Request, res: Response) => {
 
   console.log("tagss", tagss);
 
-  res.json({ tags: tagss });
+  res.status(200).json({ tags: tagss });
 });
 
 router.post("/createTag", async (req: Request, res: Response) => {
@@ -27,21 +27,12 @@ router.post("/createTag", async (req: Request, res: Response) => {
       message: `created tag "${tag.name}"`,
     });
   } catch (error: any) {
-    if (error instanceof AppError) {
-      if (error.status == 400) {
-        res.status(error.status).json({
-          message: error.message,
-        });
-      } else {
-        res.status(error.status).json({
-          message: "unknown error, (likely typeorm)",
-        });
-      }
-    } else {
-      res.status(500).json({
-        message: "Unknown error",
+    // error is an instance of AppError
+  
+      res.status(error.status).json({
+        message: error.message,
       });
-    }
+   
   }
 });
 
