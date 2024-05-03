@@ -1,10 +1,21 @@
-import { Entity, Column, OneToMany, ManyToMany } from "typeorm";
+import {
+  Entity,
+  Column,
+  OneToMany,
+  ManyToMany,
+  OneToOne,
+  JoinTable,
+  JoinColumn,
+} from "typeorm";
 import Model from "../Model.entity";
 import { Attachment, Problem } from "../Problem/Problem.entity";
 import {
   CommentDiscussionEntry,
   DiscussionEntry,
 } from "../Problem/ProblemDiscussion.entity";
+import { Student } from "./Student.entity";
+import { Teacher } from "./Teacher.entity";
+import { Administration } from "./Administration.entity";
 
 @Entity("user")
 export class User extends Model {
@@ -50,22 +61,29 @@ export class User extends Model {
   attachments: Attachment[];
 
   // TODO: User roles
-}
 
-@Entity("teacher")
-export class Teacher extends User {
-  @Column({ name: "schoolJoinDate" })
-  schoolJoinDate: Date;
-}
+  // I'm sorry wallah
+  @OneToOne((type) => Student, (stud) => stud.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  @JoinColumn()
+  student: Student;
 
-@Entity("administration")
-export class Administration extends User {
-  @Column({ name: "schoolJoinDate" })
-  schoolJoinDate: Date;
+  @OneToOne((type) => Teacher, (teacher) => teacher.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  @JoinColumn()
+  teacher: Teacher;
 
-  // @Column({ name: "roles" })
-  // roles: String;
-
-  @Column({ name: "isTeacher" })
-  isTeacher: boolean;
+  @OneToOne((type) => Administration, (administration) => administration.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  @JoinColumn()
+  administration: Administration;
 }

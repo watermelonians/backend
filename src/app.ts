@@ -7,7 +7,7 @@ import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import AppError from "./utils/appError";
-import tempRouter from "./routes/user.routes";
+import userRouter from "./routes/user.routes";
 import problemRouter from "./routes/problem.routes";
 import testRouter from "./routes/test.routes";
 
@@ -40,7 +40,7 @@ AppDataSource.initialize()
     );
 
     // ROUTES
-    app.use("/api", tempRouter);
+    app.use("/api/user", userRouter);
     app.use("/api/problem", problemRouter);
     app.use("/api/test", testRouter);
 
@@ -60,10 +60,8 @@ AppDataSource.initialize()
     // GLOBAL ERROR HANDLER
     app.use(
       (error: AppError, req: Request, res: Response, next: NextFunction) => {
-        error.status = error.status || "error";
-        error.statusCode = error.statusCode || 500;
-
-        res.status(error.statusCode).json({
+        error.status = error.status || 500;
+        res.status(error.status).json({
           status: error.status,
           message: error.message,
         });

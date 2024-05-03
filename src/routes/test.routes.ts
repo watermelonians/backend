@@ -28,11 +28,9 @@ router.post("/createTag", async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     // error is an instance of AppError
-  
-      res.status(error.status).json({
-        message: error.message,
-      });
-   
+    res.status(error.status).json({
+      message: error.message,
+    });
   }
 });
 
