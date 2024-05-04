@@ -16,6 +16,7 @@ import {
 import { Student } from "./Student.entity";
 import { Teacher } from "./Teacher.entity";
 import { Administration } from "./Administration.entity";
+import { Role } from "./Roles.entity";
 
 @Entity("user")
 export class User extends Model {
@@ -60,13 +61,18 @@ export class User extends Model {
   @OneToMany((type) => Attachment, (att) => att.user)
   attachments: Attachment[];
 
-  // TODO: User roles
+  @ManyToMany((type) => Role, (role) => role.users, {
+    eager: true,
+  })
+  @JoinTable()
+  roles: Role[];
 
   // I'm sorry wallah
   @OneToOne((type) => Student, (stud) => stud.user, {
     nullable: true,
     onDelete: "CASCADE",
     cascade: true,
+    eager: true,
   })
   @JoinColumn()
   student: Student;
@@ -75,6 +81,7 @@ export class User extends Model {
     nullable: true,
     onDelete: "CASCADE",
     cascade: true,
+    eager: true,
   })
   @JoinColumn()
   teacher: Teacher;
@@ -83,6 +90,7 @@ export class User extends Model {
     nullable: true,
     onDelete: "CASCADE",
     cascade: true,
+    eager: true,
   })
   @JoinColumn()
   administration: Administration;

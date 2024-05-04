@@ -1,5 +1,6 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, ManyToMany } from "typeorm";
 import Model from "../Model.entity";
+import { User } from "./User.entity";
 
 export enum studentRolesEnumType {
   Delegate = "Delegate",
@@ -8,46 +9,18 @@ export enum studentRolesEnumType {
   AdminBoard = "Administration Board",
 }
 
-export class StudentRoles extends Model {
+
+@Entity("role")
+export class Role extends Model {
   @Column({
-    name: "role",
-    type: "enum",
-    enum: studentRolesEnumType,
-    default: null,
+    unique: true,
+    name: "rolename",
+    type: "character varying",
   })
-  role: studentRolesEnumType;
+  roleName: string;
+
+  @ManyToMany((type) => User, (user) => user.roles)
+  users: User[];
 }
 
-enum teacherRolesEnumType {
-  Maths = "Mathematics",
-  CS = "CS",
-  AI = "AI",
-  LiteratureAndBusiness = "Literature & Business",
-}
 
-export class TeacherRoles extends Model {
-  @Column({
-    name: "role",
-    type: "enum",
-    enum: teacherRolesEnumType,
-    default: null,
-  })
-  role: teacherRolesEnumType;
-}
-
-enum adminRolesEnumType {
-  Director = "Director",
-  Department = "Department",
-  ViceDirector = "Vice Director",
-  // (...)
-}
-
-export class AdminRoles extends Model {
-  @Column({
-    name: "role",
-    type: "enum",
-    enum: adminRolesEnumType,
-    default: null,
-  })
-  role: adminRolesEnumType;
-}

@@ -1,9 +1,9 @@
 import { resolveObjectURL } from "buffer";
 import { Request, Response, Router } from "express";
 import { createTag, getTagsFromList } from "../services/tag.services";
-import { messaging } from "firebase-admin";
-import AppError from "../utils/appError";
-import { Problem } from "../entities/Problem/Problem.entity";
+import { findUserByUid } from "../services/user.services";
+import { Role } from "../entities/User/Roles.entity";
+import { assignRoleToUser, createRole } from "../services/role.services";
 
 const router = Router();
 
@@ -34,10 +34,45 @@ router.post("/createTag", async (req: Request, res: Response) => {
   }
 });
 
-router.all("/problemId", (req: Request, res: Response) => {
-  const problem = new Problem();
+// router.all("/problemId", (req: Request, res: Response) => {
+//   const problem = new Problem();
 
-  res.status(200).json({ so: problem.id ?? "shame" });
+//   res.status(200).json({ so: problem.id ?? "shame" });
+// });
+
+router.post("/createRole", async (req: Request, res: Response) => {
+  const { roleName } = req.body;
+  // const uid = res.locals.uid;
+
+  try {
+    const role = (await createRole({ roleName })) ?? new Role();
+
+    res.status(200).json({
+      message: `Created Role ${role.roleName} with id ${role.id} `,
+    });
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: error.message,
+    });
+  }
+});
+
+router.post("/assignRoleToUser", async (req: Request, res: Response) => {
+  const { uid, roleName } = req.body;
+
+  try {
+    await assignRoleToUser({ uid, roleName });
+    const user = await findUserByUid({ uid });
+
+    res.status(200).json({
+      message: "success",
+      body: user,
+    });
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: error.message,
+    });
+  }
 });
 
 export default router;

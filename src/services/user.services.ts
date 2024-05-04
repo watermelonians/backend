@@ -2,6 +2,8 @@ import { User } from "../entities/User/User.entity";
 import AppError from "../utils/appError";
 import { AppDataSource } from "../utils/data-source";
 import { Student } from "../entities/User/Student.entity";
+import { Role } from "../entities/User/Roles.entity";
+import { ArrayContainedBy } from "typeorm";
 
 const userRepository = AppDataSource.getRepository(User);
 const studentRepository = AppDataSource.getRepository(Student);
@@ -15,15 +17,21 @@ export const createUser = async (input: Partial<User>) => {
 
 export const findUserByUid = async ({ uid }: { uid: string }) => {
   try {
-    return await userRepository.findOneBy({ uid });
+    const user = await userRepository.findOneBy({ uid });
+    if (!user) {
+      throw new AppError(404, `No User found with uid ${uid}`);
+    }
+    return user;
   } catch (error: any) {
-    throw new AppError(404, `No User found with uid ${uid}`);
+    throw new AppError(500, `Error retrieving User with uid ${uid}`);
   }
 };
 
 export const findUser = async (query: Object) => {
   try {
-    return await userRepository.findOneBy(query);
+    const user = await userRepository.findOneBy(query);
+
+    return user;
   } catch (error: any) {
     throw new AppError(404, "No User found");
   }
@@ -34,7 +42,10 @@ export const findAllUsers = async () => {
     return await userRepository.find();
   } catch (error: any) {
     // console.log(error);
-    throw new AppError(500, "Unknown error retrieving all users");
+    throw new AppError(
+      500,
+      error.detail ?? "Unknown error retrieving all users"
+    );
   }
 };
 
@@ -47,7 +58,10 @@ export const findAllStudentUsers = async () => {
     });
   } catch (error: any) {
     // console.log(error);
-    throw new AppError(500, "Unknown error retrieving all users");
+    throw new AppError(
+      500,
+      error.detail ?? "Unknown error retrieving all users"
+    );
   }
 };
 
@@ -60,7 +74,10 @@ export const findAllTeacherUsers = async () => {
     });
   } catch (error: any) {
     // console.log(error);
-    throw new AppError(500, "Unknown error retrieving all users");
+    throw new AppError(
+      500,
+      error.detail ?? "Unknown error retrieving all users"
+    );
   }
 };
 
@@ -73,7 +90,10 @@ export const findAllAdministrationUsers = async () => {
     });
   } catch (error: any) {
     // console.log(error);
-    throw new AppError(500, "Unknown error retrieving all users");
+    throw new AppError(
+      500,
+      error.detail ?? "Unknown error retrieving all users"
+    );
   }
 };
 
@@ -104,4 +124,3 @@ export const createStudentUser = async ({
 
   return await studentRepository.save(student);
 };
-// (...)
