@@ -1,47 +1,97 @@
-import { Entity, Column, Index, OneToMany, PrimaryColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  OneToMany,
+  ManyToMany,
+  OneToOne,
+  JoinTable,
+  JoinColumn,
+} from "typeorm";
 import Model from "../Model.entity";
-import { Problem } from "../Problem.entity";
+import { Attachment, Problem } from "../Problem/Problem.entity";
+import {
+  CommentDiscussionEntry,
+  DiscussionEntry,
+} from "../Problem/ProblemDiscussion.entity";
+import { Student } from "./Student.entity";
+import { Teacher } from "./Teacher.entity";
+import { Administration } from "./Administration.entity";
+import { Role } from "./Roles.entity";
 
-@Entity()
+@Entity("user")
 export class User extends Model {
   // @Index("uid_index")
   @Column({ name: "uid", unique: true })
   uid: string;
 
-  @Column({ name: "fname" })
-  fName: string;
-
-  @Column({ name: "lname" })
-  lName: string;
+  @Column({ name: "displayname" })
+  displayName: string;
 
   // @Index("email_index")
   @Column({ name: "email" })
   email: string;
 
-  @Column({ name: "picture", default: "" })
-  picture: string;
+  @Column({ name: "photourl", default: "" })
+  photoURL: string;
 
   @OneToMany((type) => Problem, (prob) => prob.user, {
+    nullable: true,
     onDelete: "CASCADE",
     cascade: true,
   })
   problems: Problem[];
-}
 
-@Entity()
-export class Teacher extends User {
-  @Column({ name: "schoolJoinDate" })
-  schoolJoinDate: Date;
-}
+  @OneToMany((type) => DiscussionEntry, (de) => de.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  discussionEntries: DiscussionEntry[];
 
-@Entity()
-export class Administration extends User {
-  @Column({ name: "schoolJoinDate" })
-  schoolJoinDate: Date;
+  @OneToMany((type) => CommentDiscussionEntry, (cde) => cde.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+  })
+  commentsDiscussionEntries: CommentDiscussionEntry[];
 
-  @Column({ name: "roles" })
-  roles: String;
+  @ManyToMany((type) => Problem, (prob) => prob.likedUsers, { nullable: true })
+  likedProblems: Problem[];
 
-  @Column({ name: "isTeacher" })
-  isTeacher: boolean;
+  @OneToMany((type) => Attachment, (att) => att.user)
+  attachments: Attachment[];
+
+  @ManyToMany((type) => Role, (role) => role.users, {
+    eager: true,
+  })
+  @JoinTable()
+  roles: Role[];
+
+  // I'm sorry wallah
+  @OneToOne((type) => Student, (stud) => stud.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  @JoinColumn()
+  student: Student;
+
+  @OneToOne((type) => Teacher, (teacher) => teacher.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  @JoinColumn()
+  teacher: Teacher;
+
+  @OneToOne((type) => Administration, (administration) => administration.user, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true,
+    eager: true,
+  })
+  @JoinColumn()
+  administration: Administration;
 }
