@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToMany, PrimaryColumn } from "typeorm";
 import Model from "../Model.entity";
 import { User } from "./User.entity";
 
@@ -9,10 +9,9 @@ export enum studentRolesEnumType {
   AdminBoard = "Administration Board",
 }
 
-
 @Entity("role")
-export class Role extends Model {
-  @Column({
+export class Role extends BaseEntity {
+  @PrimaryColumn({
     unique: true,
     name: "rolename",
     type: "character varying",
@@ -22,5 +21,3 @@ export class Role extends Model {
   @ManyToMany((type) => User, (user) => user.roles)
   users: User[];
 }
-
-

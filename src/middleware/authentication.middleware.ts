@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
 import { createUser, findUserByUid } from "../services/user.services";
+import AppError from "../utils/appError";
 require("../../config/firebase-config");
 
 export const decodeToken = async (
@@ -32,24 +33,36 @@ export const addUserIfNotFound = async (
   next: NextFunction
 ) => {
   // check if user is in table User, else create new User
-  const user = await findUserByUid(res.locals.uid);
+  const uid = res.locals.uid;
+  try {
+    const user = await findUserByUid({ uid });
+    console.log(
+      `addUserIfNotFound found User ${user.displayName} with uid ${user.uid}`
+    );
 
-  if (user) {
-    console.log(
-      `addUserIfNotFound found user ${user.displayName} with uid ${user.uid}`
-    );
+    // res.locals.user =  user // Hmmmmmmmm
     next();
-  } else {
-    const createdUser = await createUser({
-      uid: res.locals.uid,
-      displayName: res.locals.displayName,
-      email: res.locals.email,
-      photoURL: res.locals.photoURL,
-    });
-    console.log(
-      `addUserIfNotFound created user ${createdUser.displayName} with uid ${createdUser.uid}`
-    );
-    res.locals.user = createdUser;
-    next();
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      console.log(`addUserIfNotFound found No User with uid ${uid}`);
+
+      const createdUser = await createUser({
+        uid: uid,
+        displayName: res.locals.displayName,
+        email: res.locals.email,
+        photoURL: res.locals.photoURL,
+      });
+
+      console.log(
+        `addUserIfNotFound created user ${createdUser.displayName} with uid ${createdUser.uid}`
+      );
+
+      // res.locals.user = createdUser; 
+      next();
+    } else {
+      res.status(500).json({
+        message: "Unknown Middleware Error",
+      });
+    }
   }
 };
