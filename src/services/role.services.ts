@@ -63,8 +63,9 @@ export const assignRoleToUser = async ({
     // console.log("\n-----------------------\nuser: ", user);
     // TODO fix chatgpt's retarded codes
     const hasRole = user.roles
-      ? user.roles.find((r) => r.id === role.id)
+      ? user.roles.find((r) => r.roleName === role.roleName)
       : false;
+
     if (!hasRole) {
       user.roles.push(role); // Add the role if not already present
     }
