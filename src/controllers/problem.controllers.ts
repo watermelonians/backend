@@ -43,7 +43,7 @@ export const addDiscussionEntryController = async (
       body,
     });
 
-    res.status(200).json({
+    res.status(201).json({
       message: `created DiscussionEntry with id ${discussionEntry.id}`,
     });
   } catch (error: any) {
@@ -82,7 +82,7 @@ export const addCommentDicussionEntryController = async (
       body,
     });
 
-    res.status(200).json({
+    res.status(201).json({
       message: `successfully created CommentDiscussionEntry with id ${cde.id}`,
     });
   } catch (error: any) {

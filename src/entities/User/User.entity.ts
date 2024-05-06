@@ -6,6 +6,7 @@ import {
   OneToOne,
   JoinTable,
   JoinColumn,
+  CommonEvents,
 } from "typeorm";
 import Model from "../Model.entity";
 import { Attachment, Problem } from "../Problem/Problem.entity";
@@ -57,6 +58,12 @@ export class User extends Model {
 
   @ManyToMany((type) => Problem, (prob) => prob.likedUsers, { nullable: true })
   likedProblems: Problem[];
+
+  @ManyToMany((type) => DiscussionEntry, (de) => de.likedUsers)
+  likedDiscussionEntries: DiscussionEntry[];
+
+  @ManyToMany((type) => CommentDiscussionEntry, (cde) => cde.likedUsers)
+  likedCommentDiscussionEntries: CommentDiscussionEntry[];
 
   @OneToMany((type) => Attachment, (att) => att.user)
   attachments: Attachment[];

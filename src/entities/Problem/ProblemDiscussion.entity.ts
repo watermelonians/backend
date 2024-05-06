@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, OneToMany } from "typeorm";
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
 import Model from "../Model.entity";
 import { User } from "../User/User.entity";
 import { Problem } from "./Problem.entity";
@@ -18,6 +25,10 @@ export class DiscussionEntry extends Model {
 
   @Column({ name: "body" })
   body: string;
+
+  @ManyToMany((type) => User, (user) => user.likedDiscussionEntries)
+  @JoinTable()
+  likedUsers: User[];
 }
 
 @Entity("commentdiscussionentry")
@@ -35,5 +46,7 @@ export class CommentDiscussionEntry extends Model {
   @Column({ name: "body" })
   body: string;
 
-  // TODO: likes for CommentDiscussionEntry
+  @ManyToMany((type) => User, (user) => user.likedDiscussionEntries)
+  @JoinTable()
+  likedUsers: User[];
 }

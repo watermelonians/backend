@@ -46,6 +46,13 @@ export class Problem extends Model {
   @JoinTable()
   likedUsers: User[];
 
+  // TODO: implement likesCount using @AfterUpdate
+  @Column({
+    name: "likecount",
+    default: 0,
+  })
+  likeCount: number;
+
   // TODO: cluster
 }
 

@@ -59,9 +59,9 @@ export const assignRoleToUser = async ({
     const role = (await findRoleByRoleName({ roleName })) ?? new Role();
     // console.log("\n-----------------------\nfound role: ", role);
 
+    // user.Roles is always fetched (eager)
     const user = await findUserByUid({ uid });
     // console.log("\n-----------------------\nuser: ", user);
-    // TODO fix chatgpt's retarded codes
     const hasRole = user.roles
       ? user.roles.find((r) => r.roleName === role.roleName)
       : false;

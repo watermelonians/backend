@@ -58,7 +58,7 @@ export const createStudentUserController = async (
   try {
     const student = await createStudentUser({ uid, promo, section, group });
 
-    res.status(200).json({
+    res.status(201).json({
       mesasge: `Created Student with id ${student.id}`,
     });
   } catch (error: any) {
@@ -75,7 +75,7 @@ export const getAllStudentUsersController = async (
   try {
     const users = await findAllStudentUsers();
 
-    res.status(200).json({
+    res.status(201).json({
       message: "successfully retrieved all users",
       body: users,
     });

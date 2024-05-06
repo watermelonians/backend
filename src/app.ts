@@ -10,6 +10,7 @@ import AppError from "./utils/appError";
 import userRouter from "./routes/user.routes";
 import problemRouter from "./routes/problem.routes";
 import testRouter from "./routes/test.routes";
+import likesRouter from "./routes/likes.routes";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -43,6 +44,7 @@ AppDataSource.initialize()
     app.use("/api/user", userRouter);
     app.use("/api/problem", problemRouter);
     app.use("/api/test", testRouter);
+    app.use("/api/likes", likesRouter)
 
     // HEALTH CHECKER
     app.get("/api/healthchecker", async (_, res: Response) => {
