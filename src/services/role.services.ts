@@ -20,7 +20,7 @@ export const createRole = async ({ roleName }: { roleName: string }) => {
       throw new AppError(400, `${error.detail}`);
     } else {
       console.log(error);
-      throw new AppError(500, error.detail ?? "Error creating Role");
+      throw new AppError(500, error.detail ?? "Unknown Error Creating Role");
     }
   }
 };
@@ -32,7 +32,7 @@ export const findRoleByRoleName = async ({
 }) => {
   try {
     const user = await roleRepository.findOneBy({ roleName });
-    console.log(`LOOOOK HERE`, user);
+    // console.log(`LOOOOK HERE`, user);
     if (!user) {
       console.log("can't find this user, throwing error");
       throw new AppError(404, `No Role found with roleName ${roleName} `);

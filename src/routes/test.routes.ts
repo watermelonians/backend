@@ -44,7 +44,7 @@ router.post("/createRole", async (req: Request, res: Response) => {
     const role = (await createRole({ roleName })) ?? new Role();
 
     res.status(200).json({
-      message: `Created Role ${role.roleName} with id ${role.id} `,
+      message: `Created Role ${role.roleName}} `,
     });
   } catch (error: any) {
     res.status(error.status).json({
